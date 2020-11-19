@@ -10,6 +10,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,7 +20,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import com.eureka.common.security.JwtConfig;
+import com.eureka.auth.security.common.JwtConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jsonwebtoken.Jwts;
@@ -35,7 +37,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 		this.authManager = authManager;
 		this.jwtConfig = jwtConfig;
 		
-		// By default, UsernamePasswordAuthenticationFilter listens to "/login" path. 
+		// By default, UsernamePasswordAuthenticationFilter listens to "/login" path.
 		// In our case, we use "/auth". So, we need to override the defaults.
 		this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher(jwtConfig.getUri(), "POST"));
 	}
@@ -83,22 +85,9 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 		response.addHeader(jwtConfig.getHeader(), jwtConfig.getPrefix() + token);
 	}
 	
-	// A (temporary) class just to represent the user credentials
+	@Getter
+	@Setter
 	private static class UserCredentials {
 	    private String username, password;
-	    
-	    public String getUsername() {
-			return username;
-		}
-	    
-	    public void setUsername(String username) {
-			this.username = username;
-		}
-	    public String getPassword() {
-			return password;
-		}
-	    public void setPassword(String password) {
-			this.password = password;
-		}
 	}
 }
