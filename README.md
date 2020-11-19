@@ -1,3 +1,8 @@
+# Microservices with Spring Boot on AWS
+Added AWS capability to original repository
+To deploy out of the box CI/CD:
+1. 
+
 # Microservices with Spring Boot
 The source code for medium series of articles on Microservices with Spring Boot. 
 
