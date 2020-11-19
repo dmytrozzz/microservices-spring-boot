@@ -11,11 +11,9 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t $IMAGE_REPO:$CODEBUILD_BUILD_NUMBER .
-      - docker tag $IMAGE_REPO:$CODEBUILD_BUILD_NUMBER $IMAGE_REPO:latest
+      - docker-compose build --parallel
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push $IMAGE_REPO:$CODEBUILD_BUILD_NUMBER
-      - docker push $IMAGE_REPO:latest
+      - docker-compose push

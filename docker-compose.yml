@@ -2,14 +2,14 @@ version: "3.8"
 
 services:
   eureka:
-    image: eureka-server
+    image: ${EUEKA_REPO}:latest
     build: ./spring-eureka-server
     ports:
     - 8761:8761
     networks:
       - microspring
   zuul:
-    image: zuul-gateway
+    image: ${ZUUL_REPO}:latest
     build: ./spring-eureka-zuul
     ports:
       - 8762:8762
@@ -20,7 +20,7 @@ services:
     environment:
       EUREKA_HOST: eureka
   auth:
-    image: auth-service
+    image: ${AUTH_REPO}:latest
     build: ./spring-eureka-auth
     ports:
     - 9100:9100
@@ -31,7 +31,7 @@ services:
     environment:
       EUREKA_HOST: eureka
   gallery:
-    image: gallery-service
+    image: ${GALLERY_REPO}:latest
     build: ./spring-eureka-gallery
     ports:
     - 8100:8100
