@@ -1,7 +1,19 @@
 # Microservices with Spring Boot on AWS
 Added AWS capability to original repository
-To deploy out of the box CI/CD:
-1. 
+0. Place your github personal access token into cicd.yml instead of "SECRET_TOKEN_HERE"  
+1. To deploy out of the box CI/CD: `aws cloudformation create-stack --stack-name cicd --template-body file://cicd.yml --capabilities CAPABILITY_IAM`
+2. To deploy ecs infrastructure: `aws cloudformation create-stack --stack-name ecs --template-body file://ecs.yml --capabilities CAPABILITY_IAM`
+3. That's it - now it will have fully available infrastructure and cicd pipelines
+### What does it do
+* dockerization of spring boot service
+* pushing to aws ecr
+* running on ecs
+* vpc, subnets, all services are private 
+* all functionality available through load balancer
+###Endpoints
+* LoadBalancerURL/auth/auth
+* LoadBalancerURL/gallery
+* LoadBalancerURL/eurekaui
 
 # Microservices with Spring Boot
 The source code for medium series of articles on Microservices with Spring Boot. 
