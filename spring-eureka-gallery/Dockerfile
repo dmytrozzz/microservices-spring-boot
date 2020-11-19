@@ -4,7 +4,7 @@ COPY pom.xml pom.xml
 RUN mvn install
 
 FROM adoptopenjdk/openjdk11:alpine-jre as release
-COPY --from=builder target/spring-eureka-student-0.0.1.jar app.jar
+COPY --from=builder target/spring-eureka-gallery-0.0.1.jar app.jar
 EXPOSE 8761
 CMD java -jar app.jar
 
