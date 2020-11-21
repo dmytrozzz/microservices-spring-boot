@@ -8,6 +8,7 @@ import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -16,12 +17,14 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 
 @Configuration
+@Profile("fargate")
 public class FargateConfig {
     /**
      * We run service in fargate so override default IP when in fargate profile
      */
     @SneakyThrows
     @Bean
+    @Profile("fargate")
     public EurekaInstanceConfigBean eurekaInstanceConfig(InetUtils inetUtils,
                                                          @Value("${server.port}") Integer port,
                                                          @Value("${env.ECS_CONTAINER_METADATA_URI_V4}") String metaUrl) {
