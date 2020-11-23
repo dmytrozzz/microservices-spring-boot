@@ -9,7 +9,7 @@ phases:
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
       - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.9/2020-11-02/bin/linux/amd64/kubectl
       - chmod +x ./kubectl
-      - aws eks --region eu-west-1 update-kubeconfig --name micro-eks-cluster-out --role
+      - aws eks --region eu-west-1 update-kubeconfig --name micro-eks-cluster-out
   build:
     commands:
       - echo Build started on `date`
