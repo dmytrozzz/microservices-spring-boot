@@ -9,15 +9,16 @@ phases:
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
       - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.9/2020-11-02/bin/linux/amd64/kubectl
       - chmod +x ./kubectl
+      - aws eks --region eu-west-1 update-kubeconfig --name micro-eks-cluster-out --role
   build:
     commands:
-        - echo Build started on `date`
-        - echo Building the Docker image...
-        - docker-compose build --parallel
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker-compose build --parallel
   post_build:
     commands:
-        - echo Build completed on `date`
-        - echo Pushing the Docker image...
-        - docker-compose push
-        - aws eks update-kubeconfig --name $CLUSTER_NAME
-        - envsubst < kubernetes.yml | kubectl apply -f -
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker-compose push
+      - envsubst < kubernetes.yml | kubectl delete -f -
+      - envsubst < kubernetes.yml | kubectl apply -f -
