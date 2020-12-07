@@ -2,14 +2,14 @@ version: "3.8"
 
 services:
   eureka:
-    image: ${EUREKA_REPO}:latest
+    image: 885887105084.dkr.ecr.eu-west-1.amazonaws.com/spring-eureka-server:latest
     build: ./spring-eureka-server
     ports:
     - 8761:8761
     networks:
       - microspring
   zuul:
-    image: ${ZUUL_REPO}:latest
+    image: 885887105084.dkr.ecr.eu-west-1.amazonaws.com/spring-eureka-zuul:latest
     build: ./spring-eureka-zuul
     ports:
       - 8762:8762
@@ -18,9 +18,10 @@ services:
     depends_on:
       - eureka
     environment:
-      EUREKA_HOST: eureka
+      EUREKA_HOST: eureka:8761
+      _JAVA_OPTIONS: "-Dlogging.level.org.springframework=DEBUG"
   auth:
-    image: ${AUTH_REPO}:latest
+    image: 885887105084.dkr.ecr.eu-west-1.amazonaws.com/spring-eureka-auth:latest
     build: ./spring-eureka-auth
     ports:
     - 9100:9100
@@ -29,9 +30,10 @@ services:
     depends_on:
       - eureka
     environment:
-      EUREKA_HOST: eureka
+      EUREKA_HOST: eureka:8761
+      _JAVA_OPTIONS: "-Dlogging.level.org.springframework=DEBUG"
   gallery:
-    image: ${GALLERY_REPO}:latest
+    image: 885887105084.dkr.ecr.eu-west-1.amazonaws.com/spring-eureka-gallery:latest
     build: ./spring-eureka-gallery
     ports:
     - 8100:8100
@@ -40,6 +42,7 @@ services:
     depends_on:
       - eureka
     environment:
-      EUREKA_HOST: eureka
+      EUREKA_HOST: eureka:8761
+      _JAVA_OPTIONS: "-Dlogging.level.org.springframework=DEBUG"
 networks:
   microspring:
