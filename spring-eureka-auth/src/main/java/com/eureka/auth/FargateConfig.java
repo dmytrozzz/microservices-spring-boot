@@ -27,7 +27,7 @@ public class FargateConfig {
     @Profile("fargate")
     public EurekaInstanceConfigBean eurekaInstanceConfig(InetUtils inetUtils,
                                                          @Value("${server.port}") Integer port,
-                                                         @Value("${env.ECS_CONTAINER_METADATA_URI_V4}") String metaUrl) {
+                                                         @Value("${ECS_CONTAINER_METADATA_URI_V4}") String metaUrl) {
         EurekaInstanceConfigBean config = new EurekaInstanceConfigBean(inetUtils);
         AmazonInfo info = AmazonInfo.Builder.newBuilder().autoBuild("eureka");
         config.setDataCenterInfo(info);
