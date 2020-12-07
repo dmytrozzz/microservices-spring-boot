@@ -42,7 +42,7 @@ public class FargateConfig {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         var privateIp = new ObjectMapper()
                 .readTree(response.body())
-                .at("Networks").get(0).at("IPv4Addresses").get(0).asText();
+                .get("Networks").get(0).get("IPv4Addresses").get(0).asText();
         config.setIpAddress(privateIp);
         config.setNonSecurePort(port);
 
