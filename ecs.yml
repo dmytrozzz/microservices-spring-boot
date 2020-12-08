@@ -294,8 +294,7 @@ Resources:
       Engine: mysql
       EngineVersion: 5.7.31
       MasterUsername: root
-      MasterUserPassword: admin
-      MaxAllocatedStorage: 16
+      MasterUserPassword: admin123!
       PubliclyAccessible: false
       StorageType: gp2
       VPCSecurityGroups:
