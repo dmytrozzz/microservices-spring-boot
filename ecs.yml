@@ -8,7 +8,7 @@ Resources:
       InstanceTenancy: default
       Tags:
         - Key: Name
-          Value: ECSStack/EcsVpc
+          Value: ecs/EcsVpc
   EcsVpcPublicSubnet1Subnet4FC26CFD:
     Type: AWS::EC2::Subnet
     Properties:
@@ -26,7 +26,7 @@ Resources:
         - Key: aws-cdk:subnet-type
           Value: Public
         - Key: Name
-          Value: ECSStack/EcsVpc/PublicSubnet1
+          Value: ecs/EcsVpc/PublicSubnet1
   EcsVpcPublicSubnet1RouteTable3F836709:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -34,7 +34,7 @@ Resources:
         Ref: EcsVpcCEF3634B
       Tags:
         - Key: Name
-          Value: ECSStack/EcsVpc/PublicSubnet1
+          Value: ecs/EcsVpc/PublicSubnet1
   EcsVpcPublicSubnet1RouteTableAssociation27B0B1F1:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -58,7 +58,7 @@ Resources:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: ECSStack/EcsVpc/PublicSubnet1
+          Value: ecs/EcsVpc/PublicSubnet1
   EcsVpcPublicSubnet1NATGateway84F4640B:
     Type: AWS::EC2::NatGateway
     Properties:
@@ -70,7 +70,7 @@ Resources:
         Ref: EcsVpcPublicSubnet1Subnet4FC26CFD
       Tags:
         - Key: Name
-          Value: ECSStack/EcsVpc/PublicSubnet1
+          Value: ecs/EcsVpc/PublicSubnet1
   EcsVpcPublicSubnet2Subnet127B1F4A:
     Type: AWS::EC2::Subnet
     Properties:
@@ -88,7 +88,7 @@ Resources:
         - Key: aws-cdk:subnet-type
           Value: Public
         - Key: Name
-          Value: ECSStack/EcsVpc/PublicSubnet2
+          Value: ecs/EcsVpc/PublicSubnet2
   EcsVpcPublicSubnet2RouteTable259A8B2D:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -96,7 +96,7 @@ Resources:
         Ref: EcsVpcCEF3634B
       Tags:
         - Key: Name
-          Value: ECSStack/EcsVpc/PublicSubnet2
+          Value: ecs/EcsVpc/PublicSubnet2
   EcsVpcPublicSubnet2RouteTableAssociation6449DB9B:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -120,7 +120,7 @@ Resources:
       Domain: vpc
       Tags:
         - Key: Name
-          Value: ECSStack/EcsVpc/PublicSubnet2
+          Value: ecs/EcsVpc/PublicSubnet2
   EcsVpcPublicSubnet2NATGatewayDFAD96D0:
     Type: AWS::EC2::NatGateway
     Properties:
@@ -132,7 +132,7 @@ Resources:
         Ref: EcsVpcPublicSubnet2Subnet127B1F4A
       Tags:
         - Key: Name
-          Value: ECSStack/EcsVpc/PublicSubnet2
+          Value: ecs/EcsVpc/PublicSubnet2
   EcsVpcPrivateSubnet1SubnetDE1C6717:
     Type: AWS::EC2::Subnet
     Properties:
@@ -150,7 +150,7 @@ Resources:
         - Key: aws-cdk:subnet-type
           Value: Private
         - Key: Name
-          Value: ECSStack/EcsVpc/PrivateSubnet1
+          Value: ecs/EcsVpc/PrivateSubnet1
   EcsVpcPrivateSubnet1RouteTable44D603B2:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -158,7 +158,7 @@ Resources:
         Ref: EcsVpcCEF3634B
       Tags:
         - Key: Name
-          Value: ECSStack/EcsVpc/PrivateSubnet1
+          Value: ecs/EcsVpc/PrivateSubnet1
   EcsVpcPrivateSubnet1RouteTableAssociationA072EBC4:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -191,7 +191,7 @@ Resources:
         - Key: aws-cdk:subnet-type
           Value: Private
         - Key: Name
-          Value: ECSStack/EcsVpc/PrivateSubnet2
+          Value: ecs/EcsVpc/PrivateSubnet2
   EcsVpcPrivateSubnet2RouteTable1CB3B77F:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -199,7 +199,7 @@ Resources:
         Ref: EcsVpcCEF3634B
       Tags:
         - Key: Name
-          Value: ECSStack/EcsVpc/PrivateSubnet2
+          Value: ecs/EcsVpc/PrivateSubnet2
   EcsVpcPrivateSubnet2RouteTableAssociation136FEFD9:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -220,7 +220,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: ECSStack/EcsVpc
+          Value: ecs/EcsVpc
   EcsVpcVPCGWE2526015:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
@@ -248,6 +248,61 @@ Resources:
           ToPort: 80
       VpcId:
         Ref: EcsVpcCEF3634B
+  DataBaseSubnetGroupA5209165:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for DataBase database
+      SubnetIds:
+        - Ref: EcsVpcPrivateSubnet1SubnetDE1C6717
+        - Ref: EcsVpcPrivateSubnet2Subnet4E5EDAB1
+  DataBaseSecurityGroup7D0B018A:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for DataBase database
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      VpcId:
+        Ref: EcsVpcCEF3634B
+  DataBaseSecurityGroupfrom00000IndirectPort10B64BD1:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      CidrIp: 0.0.0.0/0
+      Description: from 0.0.0.0/0:{IndirectPort}
+      FromPort:
+        Fn::GetAtt:
+          - DataBase7FAEC8C1
+          - Endpoint.Port
+      GroupId:
+        Fn::GetAtt:
+          - DataBaseSecurityGroup7D0B018A
+          - GroupId
+      ToPort:
+        Fn::GetAtt:
+          - DataBase7FAEC8C1
+          - Endpoint.Port
+  DataBase7FAEC8C1:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: db.m5.large
+      AllocatedStorage: "100"
+      CopyTagsToSnapshot: true
+      DBSubnetGroupName:
+        Ref: DataBaseSubnetGroupA5209165
+      Engine: mysql
+      EngineVersion: 5.7.31
+      MasterUsername: root
+      MasterUserPassword: admin
+      MaxAllocatedStorage: 16
+      PubliclyAccessible: false
+      StorageType: gp2
+      VPCSecurityGroups:
+        - Fn::GetAtt:
+            - DataBaseSecurityGroup7D0B018A
+            - GroupId
+    UpdateReplacePolicy: Snapshot
   EcsCluster97242B84:
     Type: AWS::ECS::Cluster
     Properties:
@@ -286,441 +341,74 @@ Resources:
     DependsOn:
       - EcsVpcPublicSubnet1DefaultRoute29B4D851
       - EcsVpcPublicSubnet2DefaultRouteD785541D
-  springeurekaauthTaskRole41CB04DC:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
-        Version: "2012-10-17"
-  springeurekaauth5EC851FA:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      ContainerDefinitions:
-        - Cpu: 256
-          Environment:
-            - Name: EUREKA_HOST
-              Value:
-                Fn::GetAtt:
-                  - EcsAlb6ACDFD7B
-                  - DNSName
-          Essential: true
-          Image:
-            Fn::Join:
-              - ""
-              - - Fn::Select:
-                    - 4
-                    - Fn::Split:
-                        - ":"
-                        - Fn::ImportValue: spring-eureka-auth-out
-                - .dkr.ecr.
-                - Fn::Select:
-                    - 3
-                    - Fn::Split:
-                        - ":"
-                        - Fn::ImportValue: spring-eureka-auth-out
-                - "."
-                - Ref: AWS::URLSuffix
-                - /spring-eureka-auth:latest
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group:
-                Ref: springeurekaauthspringeurekaauthcontainerLogGroupFCEE70B3
-              awslogs-stream-prefix: spring-eureka-auth-micrologs
-              awslogs-region:
-                Ref: AWS::Region
-          Memory: 512
-          Name: spring-eureka-auth-container
-          PortMappings:
-            - ContainerPort: 9100
-              Protocol: tcp
-      Cpu: "256"
-      ExecutionRoleArn:
-        Fn::GetAtt:
-          - springeurekaauthExecutionRole5C041318
-          - Arn
-      Family: spring-eureka-auth
-      Memory: "512"
-      NetworkMode: awsvpc
-      RequiresCompatibilities:
-        - FARGATE
-      TaskRoleArn:
-        Fn::GetAtt:
-          - springeurekaauthTaskRole41CB04DC
-          - Arn
-  springeurekaauthspringeurekaauthcontainerLogGroupFCEE70B3:
-    Type: AWS::Logs::LogGroup
-    UpdateReplacePolicy: Retain
-    DeletionPolicy: Retain
-  springeurekaauthExecutionRole5C041318:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
-        Version: "2012-10-17"
-  springeurekaauthExecutionRoleDefaultPolicyFFD983A7:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyDocument:
-        Statement:
-          - Action:
-              - ecr:BatchCheckLayerAvailability
-              - ecr:GetDownloadUrlForLayer
-              - ecr:BatchGetImage
-            Effect: Allow
-            Resource:
-              Fn::ImportValue: spring-eureka-auth-out
-          - Action: ecr:GetAuthorizationToken
-            Effect: Allow
-            Resource: "*"
-          - Action:
-              - logs:CreateLogStream
-              - logs:PutLogEvents
-            Effect: Allow
-            Resource:
-              Fn::GetAtt:
-                - springeurekaauthspringeurekaauthcontainerLogGroupFCEE70B3
-                - Arn
-        Version: "2012-10-17"
-      PolicyName: springeurekaauthExecutionRoleDefaultPolicyFFD983A7
-      Roles:
-        - Ref: springeurekaauthExecutionRole5C041318
-  springeurekaauthserviceService5CF18494:
-    Type: AWS::ECS::Service
-    Properties:
-      Cluster:
-        Ref: EcsCluster97242B84
-      DeploymentConfiguration:
-        MaximumPercent: 200
-        MinimumHealthyPercent: 50
-      DesiredCount: 1
-      EnableECSManagedTags: false
-      LaunchType: FARGATE
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: DISABLED
-          SecurityGroups:
-            - Fn::GetAtt:
-                - springeurekaauthserviceSecurityGroupA8448DB6
-                - GroupId
-          Subnets:
-            - Ref: EcsVpcPrivateSubnet1SubnetDE1C6717
-            - Ref: EcsVpcPrivateSubnet2Subnet4E5EDAB1
-      PlatformVersion: 1.4.0
-      ServiceName: spring-eureka-auth
-      TaskDefinition:
-        Ref: springeurekaauth5EC851FA
-  springeurekaauthserviceSecurityGroupA8448DB6:
+  springeurekazuulsecurityGroupA357B4DB:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: ECSStack/spring-eureka-auth-service/SecurityGroup
+      GroupDescription: ecs/spring-eureka-zuul-securityGroup
+      GroupName: spring-eureka-zuul-securityGroup
       SecurityGroupEgress:
         - CidrIp: 0.0.0.0/0
           Description: Allow all outbound traffic by default
           IpProtocol: "-1"
       VpcId:
         Ref: EcsVpcCEF3634B
-  springeurekagalleryTaskRoleF10CD53D:
-    Type: AWS::IAM::Role
+  springeurekazuulsecurityGroupfromecsvpcsgid08F1410787626E3518BD:
+    Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
-        Version: "2012-10-17"
-  springeurekagallery9135F3DD:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      ContainerDefinitions:
-        - Cpu: 256
-          Environment:
-            - Name: EUREKA_HOST
-              Value:
-                Fn::GetAtt:
-                  - EcsAlb6ACDFD7B
-                  - DNSName
-          Essential: true
-          Image:
-            Fn::Join:
-              - ""
-              - - Fn::Select:
-                    - 4
-                    - Fn::Split:
-                        - ":"
-                        - Fn::ImportValue: spring-eureka-gallery-out
-                - .dkr.ecr.
-                - Fn::Select:
-                    - 3
-                    - Fn::Split:
-                        - ":"
-                        - Fn::ImportValue: spring-eureka-gallery-out
-                - "."
-                - Ref: AWS::URLSuffix
-                - /spring-eureka-gallery:latest
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group:
-                Ref: springeurekagalleryspringeurekagallerycontainerLogGroupC4ADAD48
-              awslogs-stream-prefix: spring-eureka-gallery-micrologs
-              awslogs-region:
-                Ref: AWS::Region
-          Memory: 512
-          Name: spring-eureka-gallery-container
-          PortMappings:
-            - ContainerPort: 8100
-              Protocol: tcp
-      Cpu: "256"
-      ExecutionRoleArn:
+      IpProtocol: tcp
+      Description: Load balancer to target
+      FromPort: 8762
+      GroupId:
         Fn::GetAtt:
-          - springeurekagalleryExecutionRoleD3D42DA0
-          - Arn
-      Family: spring-eureka-gallery
-      Memory: "512"
-      NetworkMode: awsvpc
-      RequiresCompatibilities:
-        - FARGATE
-      TaskRoleArn:
+          - springeurekazuulsecurityGroupA357B4DB
+          - GroupId
+      SourceSecurityGroupId:
         Fn::GetAtt:
-          - springeurekagalleryTaskRoleF10CD53D
-          - Arn
-  springeurekagalleryspringeurekagallerycontainerLogGroupC4ADAD48:
-    Type: AWS::Logs::LogGroup
-    UpdateReplacePolicy: Retain
-    DeletionPolicy: Retain
-  springeurekagalleryExecutionRoleD3D42DA0:
-    Type: AWS::IAM::Role
+          - EcsVpcCEF3634B
+          - DefaultSecurityGroup
+      ToPort: 8762
+  springeurekazuulsecurityGroupfromecsEcsSecGroup4A245FB8876267B0B67B:
+    Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
-        Version: "2012-10-17"
-  springeurekagalleryExecutionRoleDefaultPolicy23D82398:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyDocument:
-        Statement:
-          - Action:
-              - ecr:BatchCheckLayerAvailability
-              - ecr:GetDownloadUrlForLayer
-              - ecr:BatchGetImage
-            Effect: Allow
-            Resource:
-              Fn::ImportValue: spring-eureka-gallery-out
-          - Action: ecr:GetAuthorizationToken
-            Effect: Allow
-            Resource: "*"
-          - Action:
-              - logs:CreateLogStream
-              - logs:PutLogEvents
-            Effect: Allow
-            Resource:
-              Fn::GetAtt:
-                - springeurekagalleryspringeurekagallerycontainerLogGroupC4ADAD48
-                - Arn
-        Version: "2012-10-17"
-      PolicyName: springeurekagalleryExecutionRoleDefaultPolicy23D82398
-      Roles:
-        - Ref: springeurekagalleryExecutionRoleD3D42DA0
-  springeurekagalleryserviceService43ABB71F:
-    Type: AWS::ECS::Service
-    Properties:
-      Cluster:
-        Ref: EcsCluster97242B84
-      DeploymentConfiguration:
-        MaximumPercent: 200
-        MinimumHealthyPercent: 50
-      DesiredCount: 1
-      EnableECSManagedTags: false
-      LaunchType: FARGATE
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: DISABLED
-          SecurityGroups:
-            - Fn::GetAtt:
-                - springeurekagalleryserviceSecurityGroup090C7F64
-                - GroupId
-          Subnets:
-            - Ref: EcsVpcPrivateSubnet1SubnetDE1C6717
-            - Ref: EcsVpcPrivateSubnet2Subnet4E5EDAB1
-      PlatformVersion: 1.4.0
-      ServiceName: spring-eureka-gallery
-      TaskDefinition:
-        Ref: springeurekagallery9135F3DD
-  springeurekagalleryserviceSecurityGroup090C7F64:
+      IpProtocol: tcp
+      Description: Load balancer to target
+      FromPort: 8762
+      GroupId:
+        Fn::GetAtt:
+          - springeurekazuulsecurityGroupA357B4DB
+          - GroupId
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - EcsSecGroup447E2DD7
+          - GroupId
+      ToPort: 8762
+  springeurekaserversecurityGroupE784A2DE:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: ECSStack/spring-eureka-gallery-service/SecurityGroup
+      GroupDescription: ecs/spring-eureka-server-securityGroup
+      GroupName: spring-eureka-server-securityGroup
       SecurityGroupEgress:
         - CidrIp: 0.0.0.0/0
           Description: Allow all outbound traffic by default
           IpProtocol: "-1"
       VpcId:
         Ref: EcsVpcCEF3634B
-  springeurekaserverTaskRole4922B4EB:
-    Type: AWS::IAM::Role
+  springeurekaserversecurityGroupfromecsspringeurekazuulsecurityGroup858CD6A88761F79BB7BC:
+    Type: AWS::EC2::SecurityGroupIngress
     Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
-        Version: "2012-10-17"
-  springeurekaserver8D1EE44B:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      ContainerDefinitions:
-        - Cpu: 256
-          Environment:
-            - Name: EUREKA_HOST
-              Value:
-                Fn::GetAtt:
-                  - EcsAlb6ACDFD7B
-                  - DNSName
-          Essential: true
-          Image:
-            Fn::Join:
-              - ""
-              - - Fn::Select:
-                    - 4
-                    - Fn::Split:
-                        - ":"
-                        - Fn::ImportValue: spring-eureka-server-out
-                - .dkr.ecr.
-                - Fn::Select:
-                    - 3
-                    - Fn::Split:
-                        - ":"
-                        - Fn::ImportValue: spring-eureka-server-out
-                - "."
-                - Ref: AWS::URLSuffix
-                - /spring-eureka-server:latest
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group:
-                Ref: springeurekaserverspringeurekaservercontainerLogGroup8BAE2BFE
-              awslogs-stream-prefix: spring-eureka-server-micrologs
-              awslogs-region:
-                Ref: AWS::Region
-          Memory: 512
-          Name: spring-eureka-server-container
-          PortMappings:
-            - ContainerPort: 8761
-              Protocol: tcp
-      Cpu: "256"
-      ExecutionRoleArn:
+      IpProtocol: tcp
+      Description: from ecsspringeurekazuulsecurityGroup858CD6A8:8761
+      FromPort: 8761
+      GroupId:
         Fn::GetAtt:
-          - springeurekaserverExecutionRoleEFE80ABD
-          - Arn
-      Family: spring-eureka-server
-      Memory: "512"
-      NetworkMode: awsvpc
-      RequiresCompatibilities:
-        - FARGATE
-      TaskRoleArn:
+          - springeurekaserversecurityGroupE784A2DE
+          - GroupId
+      SourceSecurityGroupId:
         Fn::GetAtt:
-          - springeurekaserverTaskRole4922B4EB
-          - Arn
-  springeurekaserverspringeurekaservercontainerLogGroup8BAE2BFE:
-    Type: AWS::Logs::LogGroup
-    UpdateReplacePolicy: Retain
-    DeletionPolicy: Retain
-  springeurekaserverExecutionRoleEFE80ABD:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-          - Action: sts:AssumeRole
-            Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
-        Version: "2012-10-17"
-  springeurekaserverExecutionRoleDefaultPolicyB36A8DEE:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyDocument:
-        Statement:
-          - Action:
-              - ecr:BatchCheckLayerAvailability
-              - ecr:GetDownloadUrlForLayer
-              - ecr:BatchGetImage
-            Effect: Allow
-            Resource:
-              Fn::ImportValue: spring-eureka-server-out
-          - Action: ecr:GetAuthorizationToken
-            Effect: Allow
-            Resource: "*"
-          - Action:
-              - logs:CreateLogStream
-              - logs:PutLogEvents
-            Effect: Allow
-            Resource:
-              Fn::GetAtt:
-                - springeurekaserverspringeurekaservercontainerLogGroup8BAE2BFE
-                - Arn
-        Version: "2012-10-17"
-      PolicyName: springeurekaserverExecutionRoleDefaultPolicyB36A8DEE
-      Roles:
-        - Ref: springeurekaserverExecutionRoleEFE80ABD
-  springeurekaserverserviceServiceE69BB374:
-    Type: AWS::ECS::Service
-    Properties:
-      Cluster:
-        Ref: EcsCluster97242B84
-      DeploymentConfiguration:
-        MaximumPercent: 200
-        MinimumHealthyPercent: 50
-      DesiredCount: 1
-      EnableECSManagedTags: false
-      HealthCheckGracePeriodSeconds: 60
-      LaunchType: FARGATE
-      LoadBalancers:
-        - ContainerName: spring-eureka-server-container
-          ContainerPort: 8761
-          TargetGroupArn:
-            Ref: microeurekatg037113BA
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          AssignPublicIp: DISABLED
-          SecurityGroups:
-            - Fn::GetAtt:
-                - springeurekaserverserviceSecurityGroupA488973C
-                - GroupId
-          Subnets:
-            - Ref: EcsVpcPrivateSubnet1SubnetDE1C6717
-            - Ref: EcsVpcPrivateSubnet2Subnet4E5EDAB1
-      PlatformVersion: 1.4.0
-      ServiceName: spring-eureka-server
-      TaskDefinition:
-        Ref: springeurekaserver8D1EE44B
-    DependsOn:
-      - eurekarule03A7B175
-  springeurekaserverserviceSecurityGroupA488973C:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: ECSStack/spring-eureka-server-service/SecurityGroup
-      SecurityGroupEgress:
-        - CidrIp: 0.0.0.0/0
-          Description: Allow all outbound traffic by default
-          IpProtocol: "-1"
-      VpcId:
-        Ref: EcsVpcCEF3634B
-  springeurekaserverserviceSecurityGroupfromECSStackvpcsgid41C6F19B876146583EA7:
+          - springeurekazuulsecurityGroupA357B4DB
+          - GroupId
+      ToPort: 8761
+  springeurekaserversecurityGroupfromecsvpcsgid08F14107876196491F07:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       IpProtocol: tcp
@@ -728,14 +416,14 @@ Resources:
       FromPort: 8761
       GroupId:
         Fn::GetAtt:
-          - springeurekaserverserviceSecurityGroupA488973C
+          - springeurekaserversecurityGroupE784A2DE
           - GroupId
       SourceSecurityGroupId:
         Fn::GetAtt:
           - EcsVpcCEF3634B
           - DefaultSecurityGroup
       ToPort: 8761
-  springeurekaserverserviceSecurityGroupfromECSStackEcsSecGroup0C837A5D8761E124B6FD:
+  springeurekaserversecurityGroupfromecsEcsSecGroup4A245FB88761D2666D77:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       IpProtocol: tcp
@@ -743,13 +431,65 @@ Resources:
       FromPort: 8761
       GroupId:
         Fn::GetAtt:
-          - springeurekaserverserviceSecurityGroupA488973C
+          - springeurekaserversecurityGroupE784A2DE
           - GroupId
       SourceSecurityGroupId:
         Fn::GetAtt:
           - EcsSecGroup447E2DD7
           - GroupId
       ToPort: 8761
+  springeurekagallerysecurityGroupF217F74F:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ecs/spring-eureka-gallery-securityGroup
+      GroupName: spring-eureka-gallery-securityGroup
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      VpcId:
+        Ref: EcsVpcCEF3634B
+  springeurekagallerysecurityGroupfromecsspringeurekazuulsecurityGroup858CD6A8810098996ACA:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      Description: from ecsspringeurekazuulsecurityGroup858CD6A8:8100
+      FromPort: 8100
+      GroupId:
+        Fn::GetAtt:
+          - springeurekagallerysecurityGroupF217F74F
+          - GroupId
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - springeurekazuulsecurityGroupA357B4DB
+          - GroupId
+      ToPort: 8100
+  springeurekaauthsecurityGroup010C1332:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ecs/spring-eureka-auth-securityGroup
+      GroupName: spring-eureka-auth-securityGroup
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow all outbound traffic by default
+          IpProtocol: "-1"
+      VpcId:
+        Ref: EcsVpcCEF3634B
+  springeurekaauthsecurityGroupfromecsspringeurekazuulsecurityGroup858CD6A89100CD3C898D:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      Description: from ecsspringeurekazuulsecurityGroup858CD6A8:9100
+      FromPort: 9100
+      GroupId:
+        Fn::GetAtt:
+          - springeurekaauthsecurityGroup010C1332
+          - GroupId
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - springeurekazuulsecurityGroupA357B4DB
+          - GroupId
+      ToPort: 9100
   springeurekazuulTaskRoleBE356513:
     Type: AWS::IAM::Role
     Properties:
@@ -771,6 +511,8 @@ Resources:
                 Fn::GetAtt:
                   - EcsAlb6ACDFD7B
                   - DNSName
+            - Name: SPRING_PROFILES_ACTIVE
+              Value: fargate
           Essential: true
           Image:
             Fn::Join:
@@ -779,13 +521,13 @@ Resources:
                     - 4
                     - Fn::Split:
                         - ":"
-                        - Fn::ImportValue: spring-eureka-zuul-out
+                        - Fn::ImportValue: spring-eureka-zuul-arn
                 - .dkr.ecr.
                 - Fn::Select:
                     - 3
                     - Fn::Split:
                         - ":"
-                        - Fn::ImportValue: spring-eureka-zuul-out
+                        - Fn::ImportValue: spring-eureka-zuul-arn
                 - "."
                 - Ref: AWS::URLSuffix
                 - /spring-eureka-zuul:latest
@@ -841,7 +583,7 @@ Resources:
               - ecr:BatchGetImage
             Effect: Allow
             Resource:
-              Fn::ImportValue: spring-eureka-zuul-out
+              Fn::ImportValue: spring-eureka-zuul-arn
           - Action: ecr:GetAuthorizationToken
             Effect: Allow
             Resource: "*"
@@ -879,7 +621,7 @@ Resources:
           AssignPublicIp: DISABLED
           SecurityGroups:
             - Fn::GetAtt:
-                - springeurekazuulserviceSecurityGroup4723FAF0
+                - springeurekazuulsecurityGroupA357B4DB
                 - GroupId
           Subnets:
             - Ref: EcsVpcPrivateSubnet1SubnetDE1C6717
@@ -890,46 +632,416 @@ Resources:
         Ref: springeurekazuulE901549A
     DependsOn:
       - zuulruleA0C86F44
-  springeurekazuulserviceSecurityGroup4723FAF0:
-    Type: AWS::EC2::SecurityGroup
+  springeurekaserverTaskRole4922B4EB:
+    Type: AWS::IAM::Role
     Properties:
-      GroupDescription: ECSStack/spring-eureka-zuul-service/SecurityGroup
-      SecurityGroupEgress:
-        - CidrIp: 0.0.0.0/0
-          Description: Allow all outbound traffic by default
-          IpProtocol: "-1"
-      VpcId:
-        Ref: EcsVpcCEF3634B
-  springeurekazuulserviceSecurityGroupfromECSStackvpcsgid41C6F19B8762E5600B38:
-    Type: AWS::EC2::SecurityGroupIngress
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+  springeurekaserver8D1EE44B:
+    Type: AWS::ECS::TaskDefinition
     Properties:
-      IpProtocol: tcp
-      Description: Load balancer to target
-      FromPort: 8762
-      GroupId:
+      ContainerDefinitions:
+        - Cpu: 256
+          Environment:
+            - Name: EUREKA_HOST
+              Value:
+                Fn::GetAtt:
+                  - EcsAlb6ACDFD7B
+                  - DNSName
+            - Name: SPRING_PROFILES_ACTIVE
+              Value: fargate
+          Essential: true
+          Image:
+            Fn::Join:
+              - ""
+              - - Fn::Select:
+                    - 4
+                    - Fn::Split:
+                        - ":"
+                        - Fn::ImportValue: spring-eureka-server-arn
+                - .dkr.ecr.
+                - Fn::Select:
+                    - 3
+                    - Fn::Split:
+                        - ":"
+                        - Fn::ImportValue: spring-eureka-server-arn
+                - "."
+                - Ref: AWS::URLSuffix
+                - /spring-eureka-server:latest
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group:
+                Ref: springeurekaserverspringeurekaservercontainerLogGroup8BAE2BFE
+              awslogs-stream-prefix: spring-eureka-server-micrologs
+              awslogs-region:
+                Ref: AWS::Region
+          Memory: 512
+          Name: spring-eureka-server-container
+          PortMappings:
+            - ContainerPort: 8761
+              Protocol: tcp
+      Cpu: "256"
+      ExecutionRoleArn:
         Fn::GetAtt:
-          - springeurekazuulserviceSecurityGroup4723FAF0
-          - GroupId
-      SourceSecurityGroupId:
+          - springeurekaserverExecutionRoleEFE80ABD
+          - Arn
+      Family: spring-eureka-server
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn:
         Fn::GetAtt:
-          - EcsVpcCEF3634B
-          - DefaultSecurityGroup
-      ToPort: 8762
-  springeurekazuulserviceSecurityGroupfromECSStackEcsSecGroup0C837A5D87623BCC153A:
-    Type: AWS::EC2::SecurityGroupIngress
+          - springeurekaserverTaskRole4922B4EB
+          - Arn
+  springeurekaserverspringeurekaservercontainerLogGroup8BAE2BFE:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  springeurekaserverExecutionRoleEFE80ABD:
+    Type: AWS::IAM::Role
     Properties:
-      IpProtocol: tcp
-      Description: Load balancer to target
-      FromPort: 8762
-      GroupId:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+  springeurekaserverExecutionRoleDefaultPolicyB36A8DEE:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - ecr:BatchCheckLayerAvailability
+              - ecr:GetDownloadUrlForLayer
+              - ecr:BatchGetImage
+            Effect: Allow
+            Resource:
+              Fn::ImportValue: spring-eureka-server-arn
+          - Action: ecr:GetAuthorizationToken
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - springeurekaserverspringeurekaservercontainerLogGroup8BAE2BFE
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: springeurekaserverExecutionRoleDefaultPolicyB36A8DEE
+      Roles:
+        - Ref: springeurekaserverExecutionRoleEFE80ABD
+  springeurekaserverserviceServiceE69BB374:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Ref: EcsCluster97242B84
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      DesiredCount: 1
+      EnableECSManagedTags: false
+      HealthCheckGracePeriodSeconds: 60
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: spring-eureka-server-container
+          ContainerPort: 8761
+          TargetGroupArn:
+            Ref: microeurekatg037113BA
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::GetAtt:
+                - springeurekaserversecurityGroupE784A2DE
+                - GroupId
+          Subnets:
+            - Ref: EcsVpcPrivateSubnet1SubnetDE1C6717
+            - Ref: EcsVpcPrivateSubnet2Subnet4E5EDAB1
+      PlatformVersion: 1.4.0
+      ServiceName: spring-eureka-server
+      TaskDefinition:
+        Ref: springeurekaserver8D1EE44B
+    DependsOn:
+      - eurekarule03A7B175
+  springeurekagalleryTaskRoleF10CD53D:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+  springeurekagallery9135F3DD:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Cpu: 256
+          Environment:
+            - Name: EUREKA_HOST
+              Value:
+                Fn::GetAtt:
+                  - EcsAlb6ACDFD7B
+                  - DNSName
+            - Name: SPRING_PROFILES_ACTIVE
+              Value: fargate
+          Essential: true
+          Image:
+            Fn::Join:
+              - ""
+              - - Fn::Select:
+                    - 4
+                    - Fn::Split:
+                        - ":"
+                        - Fn::ImportValue: spring-eureka-gallery-arn
+                - .dkr.ecr.
+                - Fn::Select:
+                    - 3
+                    - Fn::Split:
+                        - ":"
+                        - Fn::ImportValue: spring-eureka-gallery-arn
+                - "."
+                - Ref: AWS::URLSuffix
+                - /spring-eureka-gallery:latest
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group:
+                Ref: springeurekagalleryspringeurekagallerycontainerLogGroupC4ADAD48
+              awslogs-stream-prefix: spring-eureka-gallery-micrologs
+              awslogs-region:
+                Ref: AWS::Region
+          Memory: 512
+          Name: spring-eureka-gallery-container
+          PortMappings:
+            - ContainerPort: 8100
+              Protocol: tcp
+      Cpu: "256"
+      ExecutionRoleArn:
         Fn::GetAtt:
-          - springeurekazuulserviceSecurityGroup4723FAF0
-          - GroupId
-      SourceSecurityGroupId:
+          - springeurekagalleryExecutionRoleD3D42DA0
+          - Arn
+      Family: spring-eureka-gallery
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn:
         Fn::GetAtt:
-          - EcsSecGroup447E2DD7
-          - GroupId
-      ToPort: 8762
+          - springeurekagalleryTaskRoleF10CD53D
+          - Arn
+  springeurekagalleryspringeurekagallerycontainerLogGroupC4ADAD48:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  springeurekagalleryExecutionRoleD3D42DA0:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+  springeurekagalleryExecutionRoleDefaultPolicy23D82398:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - ecr:BatchCheckLayerAvailability
+              - ecr:GetDownloadUrlForLayer
+              - ecr:BatchGetImage
+            Effect: Allow
+            Resource:
+              Fn::ImportValue: spring-eureka-gallery-arn
+          - Action: ecr:GetAuthorizationToken
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - springeurekagalleryspringeurekagallerycontainerLogGroupC4ADAD48
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: springeurekagalleryExecutionRoleDefaultPolicy23D82398
+      Roles:
+        - Ref: springeurekagalleryExecutionRoleD3D42DA0
+  springeurekagalleryserviceService43ABB71F:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Ref: EcsCluster97242B84
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      DesiredCount: 1
+      EnableECSManagedTags: false
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::GetAtt:
+                - springeurekagallerysecurityGroupF217F74F
+                - GroupId
+          Subnets:
+            - Ref: EcsVpcPrivateSubnet1SubnetDE1C6717
+            - Ref: EcsVpcPrivateSubnet2Subnet4E5EDAB1
+      PlatformVersion: 1.4.0
+      ServiceName: spring-eureka-gallery
+      TaskDefinition:
+        Ref: springeurekagallery9135F3DD
+  springeurekaauthTaskRole41CB04DC:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+  springeurekaauth5EC851FA:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Cpu: 256
+          Environment:
+            - Name: EUREKA_HOST
+              Value:
+                Fn::GetAtt:
+                  - EcsAlb6ACDFD7B
+                  - DNSName
+            - Name: SPRING_PROFILES_ACTIVE
+              Value: fargate
+          Essential: true
+          Image:
+            Fn::Join:
+              - ""
+              - - Fn::Select:
+                    - 4
+                    - Fn::Split:
+                        - ":"
+                        - Fn::ImportValue: spring-eureka-auth-arn
+                - .dkr.ecr.
+                - Fn::Select:
+                    - 3
+                    - Fn::Split:
+                        - ":"
+                        - Fn::ImportValue: spring-eureka-auth-arn
+                - "."
+                - Ref: AWS::URLSuffix
+                - /spring-eureka-auth:latest
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group:
+                Ref: springeurekaauthspringeurekaauthcontainerLogGroupFCEE70B3
+              awslogs-stream-prefix: spring-eureka-auth-micrologs
+              awslogs-region:
+                Ref: AWS::Region
+          Memory: 512
+          Name: spring-eureka-auth-container
+          PortMappings:
+            - ContainerPort: 9100
+              Protocol: tcp
+      Cpu: "256"
+      ExecutionRoleArn:
+        Fn::GetAtt:
+          - springeurekaauthExecutionRole5C041318
+          - Arn
+      Family: spring-eureka-auth
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn:
+        Fn::GetAtt:
+          - springeurekaauthTaskRole41CB04DC
+          - Arn
+  springeurekaauthspringeurekaauthcontainerLogGroupFCEE70B3:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  springeurekaauthExecutionRole5C041318:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+        Version: "2012-10-17"
+  springeurekaauthExecutionRoleDefaultPolicyFFD983A7:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - ecr:BatchCheckLayerAvailability
+              - ecr:GetDownloadUrlForLayer
+              - ecr:BatchGetImage
+            Effect: Allow
+            Resource:
+              Fn::ImportValue: spring-eureka-auth-arn
+          - Action: ecr:GetAuthorizationToken
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - springeurekaauthspringeurekaauthcontainerLogGroupFCEE70B3
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: springeurekaauthExecutionRoleDefaultPolicyFFD983A7
+      Roles:
+        - Ref: springeurekaauthExecutionRole5C041318
+  springeurekaauthserviceService5CF18494:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+        Ref: EcsCluster97242B84
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 50
+      DesiredCount: 1
+      EnableECSManagedTags: false
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - Fn::GetAtt:
+                - springeurekaauthsecurityGroup010C1332
+                - GroupId
+          Subnets:
+            - Ref: EcsVpcPrivateSubnet1SubnetDE1C6717
+            - Ref: EcsVpcPrivateSubnet2Subnet4E5EDAB1
+      PlatformVersion: 1.4.0
+      ServiceName: spring-eureka-auth
+      TaskDefinition:
+        Ref: springeurekaauth5EC851FA
   EcsAlbListener501237C7:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -1008,4 +1120,19 @@ Resources:
       ListenerArn:
         Ref: EcsAlbListener501237C7
       Priority: 3
+Outputs:
+  dbCnnection:
+    Value:
+      Fn::GetAtt:
+        - DataBase7FAEC8C1
+        - Endpoint.Address
+    Export:
+      Name: dbConnection
+  ALBUri:
+    Value:
+      Fn::GetAtt:
+        - EcsAlb6ACDFD7B
+        - DNSName
+    Export:
+      Name: alb-uri
 
