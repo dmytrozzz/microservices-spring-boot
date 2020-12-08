@@ -3,6 +3,7 @@ package com.cogent.eurekaserver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.appinfo.AmazonInfo;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
@@ -18,6 +19,7 @@ import java.time.Duration;
 
 @Configuration
 @Profile("fargate")
+@Log4j2
 public class FargateConfig {
     /**
      * We run service in fargate so override default IP when in fargate profile
@@ -37,6 +39,7 @@ public class FargateConfig {
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        log.info(response.body());
         var privateIp = new ObjectMapper()
                 .readTree(response.body())
                 .get("Networks").get(0).get("IPv4Addresses").get(0).asText();
