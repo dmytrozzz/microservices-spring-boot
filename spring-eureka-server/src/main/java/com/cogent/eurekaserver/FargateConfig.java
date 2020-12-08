@@ -29,9 +29,6 @@ public class FargateConfig {
                                                          @Value("${server.port}") Integer port,
                                                          @Value("${ECS_CONTAINER_METADATA_URI_V4}") String metaUrl) {
         EurekaInstanceConfigBean config = new EurekaInstanceConfigBean(inetUtils);
-        AmazonInfo info = AmazonInfo.Builder.newBuilder().autoBuild("eureka");
-        config.setDataCenterInfo(info);
-
         var client = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(metaUrl))
@@ -43,6 +40,7 @@ public class FargateConfig {
         var privateIp = new ObjectMapper()
                 .readTree(response.body())
                 .get("Networks").get(0).get("IPv4Addresses").get(0).asText();
+
         config.setIpAddress(privateIp);
         config.setNonSecurePort(port);
 
