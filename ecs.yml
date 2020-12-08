@@ -286,7 +286,7 @@ Resources:
   DataBase7FAEC8C1:
     Type: AWS::RDS::DBInstance
     Properties:
-      DBInstanceClass: db.m5.large
+      DBInstanceClass: db.m3.medium
       AllocatedStorage: "100"
       CopyTagsToSnapshot: true
       DBSubnetGroupName:

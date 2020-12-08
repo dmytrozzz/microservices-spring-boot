@@ -1,0 +1,164 @@
+Resources:
+  pipelines3bucket60FDE7F2:
+    Type: AWS::S3::Bucket
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  springeurekaserverrepo1350F586:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: spring-eureka-server
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  springeurekazuulrepo3CAF3D98:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: spring-eureka-zuul
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  springeurekaauthrepo62035FE7:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: spring-eureka-auth
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+  springeurekagalleryrepoC474C0E2:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: spring-eureka-gallery
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+Outputs:
+  pipelines3bucketout:
+    Value:
+      Ref: pipelines3bucket60FDE7F2
+    Export:
+      Name: pipeline-s3-bucket-name
+  springeurekagalleryoutarn:
+    Value:
+      Fn::GetAtt:
+        - springeurekagalleryrepoC474C0E2
+        - Arn
+    Export:
+      Name: spring-eureka-gallery-arn
+  springeurekaauthoutarn:
+    Value:
+      Fn::GetAtt:
+        - springeurekaauthrepo62035FE7
+        - Arn
+    Export:
+      Name: spring-eureka-auth-arn
+  springeurekaserveroutarn:
+    Value:
+      Fn::GetAtt:
+        - springeurekaserverrepo1350F586
+        - Arn
+    Export:
+      Name: spring-eureka-server-arn
+  springeurekazuuloutarn:
+    Value:
+      Fn::GetAtt:
+        - springeurekazuulrepo3CAF3D98
+        - Arn
+    Export:
+      Name: spring-eureka-zuul-arn
+  springeurekagalleryouturi:
+    Value:
+      Fn::Join:
+        - ""
+        - - Fn::Select:
+              - 4
+              - Fn::Split:
+                  - ":"
+                  - Fn::GetAtt:
+                      - springeurekagalleryrepoC474C0E2
+                      - Arn
+          - .dkr.ecr.
+          - Fn::Select:
+              - 3
+              - Fn::Split:
+                  - ":"
+                  - Fn::GetAtt:
+                      - springeurekagalleryrepoC474C0E2
+                      - Arn
+          - "."
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: springeurekagalleryrepoC474C0E2
+    Export:
+      Name: spring-eureka-gallery-uri
+  springeurekaauthouturi:
+    Value:
+      Fn::Join:
+        - ""
+        - - Fn::Select:
+              - 4
+              - Fn::Split:
+                  - ":"
+                  - Fn::GetAtt:
+                      - springeurekaauthrepo62035FE7
+                      - Arn
+          - .dkr.ecr.
+          - Fn::Select:
+              - 3
+              - Fn::Split:
+                  - ":"
+                  - Fn::GetAtt:
+                      - springeurekaauthrepo62035FE7
+                      - Arn
+          - "."
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: springeurekaauthrepo62035FE7
+    Export:
+      Name: spring-eureka-auth-uri
+  springeurekaserverouturi:
+    Value:
+      Fn::Join:
+        - ""
+        - - Fn::Select:
+              - 4
+              - Fn::Split:
+                  - ":"
+                  - Fn::GetAtt:
+                      - springeurekaserverrepo1350F586
+                      - Arn
+          - .dkr.ecr.
+          - Fn::Select:
+              - 3
+              - Fn::Split:
+                  - ":"
+                  - Fn::GetAtt:
+                      - springeurekaserverrepo1350F586
+                      - Arn
+          - "."
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: springeurekaserverrepo1350F586
+    Export:
+      Name: spring-eureka-server-uri
+  springeurekazuulouturi:
+    Value:
+      Fn::Join:
+        - ""
+        - - Fn::Select:
+              - 4
+              - Fn::Split:
+                  - ":"
+                  - Fn::GetAtt:
+                      - springeurekazuulrepo3CAF3D98
+                      - Arn
+          - .dkr.ecr.
+          - Fn::Select:
+              - 3
+              - Fn::Split:
+                  - ":"
+                  - Fn::GetAtt:
+                      - springeurekazuulrepo3CAF3D98
+                      - Arn
+          - "."
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: springeurekazuulrepo3CAF3D98
+    Export:
+      Name: spring-eureka-zuul-uri
+

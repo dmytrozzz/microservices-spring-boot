@@ -1,18 +1,28 @@
 # Microservices with Spring Boot on AWS
 Added AWS capability to original repository
-0. Place your github personal access token into cicd.yml instead of "SECRET_TOKEN_HERE"  
-1. To deploy out of the box CI/CD: `aws cloudformation create-stack --stack-name cicd --template-body file://cicd.yml --capabilities CAPABILITY_IAM`
-2. To deploy ecs infrastructure: `aws cloudformation create-stack --stack-name ecs --template-body file://ecs.yml --capabilities CAPABILITY_IAM`
-3. That's it - now it will have fully available infrastructure and cicd pipelines
+0. Place your github personal access token into pipeline.yml instead of "SECRET_TOKEN_HERE"  
+1. Deploy ECR and S3 resources: `aws cloudformation create-stack --stack-name cicd-resources --template-body file://retain.yml --capabilities CAPABILITY_IAM`
+2. To deploy out of the box CI/CD: `aws cloudformation create-stack --stack-name cicd --template-body file://cicd.yml --capabilities CAPABILITY_IAM`
+3. Trigger cicd pipeline from AWS console (if not yet automatically) or by pushing to the repo.
+4. That's it - now it will have fully available infrastructure and cicd pipelines
+CICD deploys ECS stack and services and output the LoadBalancer URL and DB url
+
 ### What does it do
 * dockerization of spring boot service
 * pushing to aws ecr
 * running on ecs
 * vpc, subnets, all services are private 
 * all functionality available through load balancer
+
 ###Endpoints
-* LoadBalancerURL/auth/auth
-* LoadBalancerURL/gallery
+* LoadBalancerURL/api/auth/auth - POST to get token
+  `{
+  "username": "admin",
+  "password": "12345"
+  }`
+* LoadBalancerURL/api/gallery - 
+  `GET 
+  Authorization: Bearer token from previous request`
 * LoadBalancerURL/eurekaui
 
 # Microservices with Spring Boot
