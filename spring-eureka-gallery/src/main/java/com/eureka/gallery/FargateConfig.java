@@ -43,6 +43,8 @@ public class FargateConfig {
         var privateIp = new ObjectMapper()
                 .readTree(response.body())
                 .get("Networks").get(0).get("IPv4Addresses").get(0).asText();
+
+        config.setHostname(privateIp);
         config.setIpAddress(privateIp);
         config.setNonSecurePort(port);
 
